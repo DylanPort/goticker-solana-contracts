@@ -1,0 +1,57 @@
+# Rust/Cargo
+target/
+**/*.rs.bk
+
+# Anchor
+.anchor/
+test-ledger/
+
+# Solana keys (keep private)
+*keypair.json
+*.json
+!Anchor.toml
+!Cargo.toml
+!package.json
+
+# Node modules
+node_modules/
+
+# Build artifacts
+*.so
+*.dll
+*.dylib
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env*
+
+# Frontend and other non-contract files
+.next/
+out/
+goticker-frontend/
+goticker-frontend-backup/
+pages/
+lib/
+docs/
+scripts/
+sql/
+csv_files/
+*.txt
+*.md
+!README.md
+*.js
+!.github/workflows/*.yml
+*.ps1
+*.sh
+netlify.toml
+next-env.d.ts
+tsconfig*
+yarn.lock
+package-lock.json
+solana-install-init.exe
+
+# Allow Rust source files in programs directory
+!programs/**/src/**/*.rs 

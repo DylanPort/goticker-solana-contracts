@@ -1,0 +1,82 @@
+name: Build Solana Programs
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Cache Solana CLI
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/solana
+          ~/.local/share/solana
+        key: ${{ runner.os }}-solana-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-solana-
+          
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+          
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+        
+    - name: Install Solana CLI
+      run: |
+        sh -c "$(curl -sSfL https://release.solana.com/v1.18.26/install)"
+        echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+        
+    - name: Install Anchor CLI
+      run: |
+        npm install -g @coral-xyz/anchor-cli@0.26.0
+        
+    - name: Verify installations
+      run: |
+        solana --version
+        anchor --version
+        rustc --version
+        cargo --version
+        
+    - name: Configure Solana for devnet
+      run: |
+        solana config set --url https://api.devnet.solana.com
+        
+    - name: Build programs
+      run: |
+        anchor build
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: solana-programs
+        path: |
+          target/deploy/*.so
+          target/idl/*.json
+        retention-days: 7
+        
+    - name: List built programs
+      run: |
+        echo "Built programs:"
+        ls -la target/deploy/ || echo "No deploy directory found"
+        echo "IDL files:"
+        ls -la target/idl/ || echo "No IDL directory found" 
