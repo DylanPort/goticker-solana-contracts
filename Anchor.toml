@@ -5,15 +5,19 @@ anchor_version = "0.26.0"
 seeds = false
 skip-lint = false
 
+[programs.devnet]
+goticker = "9AcKM9kiHLxM22V3QUY6QsxQFysWiE8oLqAUA6PrQRWB"
+ticker-economy = "6qNwVB7W2Mgb2AMB74cxKz9u5q3nf3dyPndHNN2y3Hna"
+
 [programs.mainnet]
 goticker = "9AcKM9kiHLxM22V3QUY6QsxQFysWiE8oLqAUA6PrQRWB"
-ticker_economy = "6qNwVB7W2Mgb2AMB74cxKz9u5q3nf3dyPndHNN2y3Hna"
+ticker-economy = "6qNwVB7W2Mgb2AMB74cxKz9u5q3nf3dyPndHNN2y3Hna"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "mainnet"
+cluster = "devnet"
 wallet = "./wallet-keypair.json"
 
 [scripts]
