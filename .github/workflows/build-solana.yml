@@ -43,9 +43,12 @@ jobs:
         
     - name: Install Solana CLI
       run: |
-        sh -c "$(curl -sSfL https://release.solana.com/v1.18.26/install)"
-        echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+        curl -sSfL https://release.solana.com/v1.18.26/install | sh
         export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+        echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+        # Verify installation
+        ls -la $HOME/.local/share/solana/install/active_release/bin/
+        $HOME/.local/share/solana/install/active_release/bin/solana --version
         
     - name: Install Anchor CLI
       run: |
@@ -54,19 +57,16 @@ jobs:
     - name: Verify installations
       run: |
         export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-        echo "PATH: $PATH"
-        ls -la $HOME/.local/share/solana/install/active_release/bin/ || echo "Solana bin directory not found"
-        which solana || echo "solana command not found"
-        solana --version || echo "solana version failed"
-        which anchor || echo "anchor command not found"
-        anchor --version || echo "anchor version failed"
+        echo "Verifying all installations..."
+        $HOME/.local/share/solana/install/active_release/bin/solana --version
+        anchor --version
         rustc --version
         cargo --version
         
     - name: Configure Solana for devnet
       run: |
         export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-        solana config set --url https://api.devnet.solana.com
+        $HOME/.local/share/solana/install/active_release/bin/solana config set --url https://api.devnet.solana.com
         
     - name: Build programs
       run: |
