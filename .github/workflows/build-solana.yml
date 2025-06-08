@@ -20,7 +20,7 @@ jobs:
       with:
         path: |
           ~/.cache/solana
-          ~/.local/share/solana
+          ~/.local/bin/solana*
         key: ${{ runner.os }}-solana-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
           ${{ runner.os }}-solana-
@@ -43,15 +43,21 @@ jobs:
         
     - name: Install Solana CLI
       run: |
-        # Try stable version first, fallback to specific version
-        curl -sSfL https://release.solana.com/stable/install | sh || \
-        curl -sSfL https://release.solana.com/v1.18.25/install | sh || \
-        curl -sSfL https://release.solana.com/v1.18.24/install | sh
-        export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-        echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+        # Download pre-built binary directly
+        mkdir -p $HOME/.local/bin
+        cd $HOME/.local/bin
+        # Try to download from GitHub releases
+        wget -q https://github.com/solana-labs/solana/releases/download/v1.18.26/solana-release-x86_64-unknown-linux-gnu.tar.bz2 -O solana.tar.bz2 || \
+        wget -q https://github.com/solana-labs/solana/releases/download/v1.18.25/solana-release-x86_64-unknown-linux-gnu.tar.bz2 -O solana.tar.bz2 || \
+        wget -q https://github.com/solana-labs/solana/releases/download/v1.18.24/solana-release-x86_64-unknown-linux-gnu.tar.bz2 -O solana.tar.bz2
+        tar -xjf solana.tar.bz2
+        mv solana-release/bin/* .
+        rm -rf solana-release solana.tar.bz2
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        export PATH="$HOME/.local/bin:$PATH"
         # Verify installation
-        ls -la $HOME/.local/share/solana/install/active_release/bin/
-        $HOME/.local/share/solana/install/active_release/bin/solana --version
+        ls -la $HOME/.local/bin/
+        $HOME/.local/bin/solana --version
         
     - name: Install Anchor CLI
       run: |
@@ -59,21 +65,21 @@ jobs:
         
     - name: Verify installations
       run: |
-        export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
         echo "Verifying all installations..."
-        $HOME/.local/share/solana/install/active_release/bin/solana --version
+        $HOME/.local/bin/solana --version
         anchor --version
         rustc --version
         cargo --version
         
     - name: Configure Solana for devnet
       run: |
-        export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-        $HOME/.local/share/solana/install/active_release/bin/solana config set --url https://api.devnet.solana.com
+        export PATH="$HOME/.local/bin:$PATH"
+        $HOME/.local/bin/solana config set --url https://api.devnet.solana.com
         
     - name: Build programs
       run: |
-        export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
         anchor build
         
     - name: Upload build artifacts
