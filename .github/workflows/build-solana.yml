@@ -43,7 +43,10 @@ jobs:
         
     - name: Install Solana CLI
       run: |
-        curl -sSfL https://release.solana.com/v1.18.26/install | sh
+        # Try stable version first, fallback to specific version
+        curl -sSfL https://release.solana.com/stable/install | sh || \
+        curl -sSfL https://release.solana.com/v1.18.25/install | sh || \
+        curl -sSfL https://release.solana.com/v1.18.24/install | sh
         export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
         echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
         # Verify installation
